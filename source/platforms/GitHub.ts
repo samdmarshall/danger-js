@@ -36,7 +36,7 @@ export function GitHub(api: GitHubAPI) {
 
     api,
     getReviewInfo: api.getPullRequestInfo,
-    getPlatformGitRepresentation: () => gitDSLForGitHub(api),
+    getPlatformSCMRepresentation: () => gitDSLForGitHub(api),
 
     getPlatformReviewDSLRepresentation: async () => {
       let pr: GitHubPRDSL

@@ -21,7 +21,7 @@ export const localGetDiff = (base: string, head: string, staging: boolean = fals
       throw new Error(data.toString())
     })
 
-    child.on("close", function(code) {
+    child.on("close", function (code) {
       if (code === 0) {
         done(stdout)
       }

@@ -28,7 +28,7 @@ export class BitBucketServer implements Platform {
    *
    * @returns {Promise<GitDSL>} the git DSL
    */
-  getPlatformGitRepresentation = (): Promise<GitJSONDSL> => gitDSLForBitBucketServer(this.api)
+  getPlatformSCMRepresentation = (): Promise<GitJSONDSL> => gitDSLForBitBucketServer(this.api)
 
   /**
    * Gets inline comments for current PR

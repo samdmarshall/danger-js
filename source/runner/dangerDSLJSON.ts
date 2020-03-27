@@ -1,5 +1,6 @@
 import { DangerDSLJSONType } from "../dsl/DangerDSL"
 import { GitJSONDSL } from "../dsl/GitDSL"
+import { HgJSONDSL } from "../dsl/HgDSL"
 import { GitHubDSL } from "../dsl/GitHubDSL"
 import { CliArgs } from "../dsl/cli-args"
 
@@ -14,6 +15,8 @@ export class DangerDSLJSON implements DangerDSLJSONType {
 
   // @ts-ignore
   git: GitJSONDSL
+  // @ts-ignore
+  hg: HgJSONDSL
   // @ts-ignore
   github: GitHubDSL
   // @ts-ignore

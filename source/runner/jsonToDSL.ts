@@ -4,8 +4,10 @@ import { DangerDSLJSONType, DangerDSLType } from "../dsl/DangerDSL"
 import { gitHubGitDSL as githubJSONToGitDSL } from "../platforms/github/GitHubGit"
 import { githubJSONToGitHubDSL } from "../platforms/GitHub"
 import { sentence, href } from "./DangerUtils"
-import { LocalGit } from "../platforms/LocalGit"
+import { isGitRepo, LocalGit } from "../platforms/LocalGit"
+import { isHgRepo, LocalHg } from "../platforms/LocalHg"
 import { GitDSL } from "../dsl/GitDSL"
+import { HgDSL } from "../dsl/HgDSL"
 import { bitBucketServerGitDSL } from "../platforms/bitbucket_server/BitBucketServerGit"
 import {
   BitBucketServerAPI,
@@ -37,10 +39,21 @@ export const jsonToDSL = async (dsl: DangerDSLJSONType, source: CISource): Promi
   const bitbucket_cloud = dsl.bitbucket_cloud
   const gitlab = dsl.gitlab && gitlabJSONToGitLabDSL(dsl.gitlab, api as GitLabAPI)
 
+  let hg: HgDSL
   let git: GitDSL
+
   if (!platformExists) {
-    const localPlatform = new LocalGit(dsl.settings.cliArgs)
-    git = await localPlatform.getPlatformGitRepresentation()
+
+    if (isGitRepo()) {
+      const localPlatform = new LocalGit(dsl.settings.cliArgs)
+      git = await localPlatform.getPlatformSCMRepresentation()
+    }
+
+    if (isHgRepo()) {
+      const localPlatform = new LocalHg(dsl.settings.cliArgs)
+      hg = await localPlatform.getPlatformSCMRepresentation()
+    }
+
   } else if (process.env["DANGER_BITBUCKETSERVER_HOST"]) {
     git = bitBucketServerGitDSL(bitbucket_server!, dsl.git, api as BitBucketServerAPI)
   } else if (process.env["DANGER_BITBUCKETCLOUD_OAUTH_KEY"] || process.env["DANGER_BITBUCKETCLOUD_USERNAME"]) {
@@ -52,7 +65,8 @@ export const jsonToDSL = async (dsl: DangerDSLJSONType, source: CISource): Promi
   }
 
   return {
-    git,
+    git: git!,
+    hg: hg!,
     // Strictly speaking, this is a lie. Only one of these will _ever_ exist, but
     // otherwise everyone would need to have a check for GitHub/BBS in every Dangerfile
     // which just doesn't feel right.

@@ -30,7 +30,7 @@ class GitLab implements Platform {
     }
   }
 
-  getPlatformGitRepresentation = async (): Promise<GitJSONDSL> => {
+  getPlatformSCMRepresentation = async (): Promise<GitJSONDSL> => {
     const changes = await this.api.getMergeRequestChanges()
     const commits = await this.api.getMergeRequestCommits()
 

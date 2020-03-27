@@ -18,7 +18,7 @@ export class FakePlatform implements Platform {
     return {}
   }
 
-  async getPlatformGitRepresentation(): Promise<GitDSL> {
+  async getPlatformSCMRepresentation(): Promise<GitDSL> {
     return {
       modified_files: [],
       created_files: [],

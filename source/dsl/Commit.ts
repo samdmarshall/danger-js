@@ -1,11 +1,17 @@
 /** A platform agnostic reference to a Git commit */
-export interface GitCommit {
+export interface GitCommit extends Commit { }
+
+/** A platform agnostic reference to a Hg commit */
+export interface HgCommit extends Commit { }
+
+/** A platform agnostic reference to a commit */
+export interface Commit {
   /** The SHA for the commit */
   sha: string
   /** Who wrote the commit */
-  author: GitCommitAuthor
+  author: CommitAuthor
   /** Who deployed the commit */
-  committer: GitCommitAuthor
+  committer: CommitAuthor
   /** The commit message */
   message: string
   /** Potential parent commits, and other assorted metadata */
@@ -17,7 +23,7 @@ export interface GitCommit {
 }
 
 /** An author of a commit */
-export interface GitCommitAuthor {
+export interface CommitAuthor {
   /** The display name for the author */
   name: string
   /** The authors email */
