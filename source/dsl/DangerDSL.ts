@@ -1,6 +1,7 @@
 // Please don't have includes in here that aren't inside the DSL folder, or the d.ts/flow defs break
 
 import { GitDSL, GitJSONDSL } from "../dsl/GitDSL"
+import { HgDSL, HgJSONDSL } from "../dsl/HgDSL"
 import { GitHubDSL } from "../dsl/GitHubDSL"
 import { BitBucketServerDSL, BitBucketServerJSONDSL } from "../dsl/BitBucketServerDSL"
 import { DangerUtilsDSL } from "./DangerUtilsDSL"
@@ -63,6 +64,8 @@ export interface DangerDSLJSONType {
   bitbucket_cloud?: BitBucketCloudJSONDSL
   /** The data only version of GitLab DSL */
   gitlab?: GitLabDSL
+  /** the data only version of the Hg DSL */
+  hg: HgJSONDSL
   /**
    * Used in the Danger JSON DSL to pass metadata between
    * processes. It will be undefined when used inside the Danger DSL
@@ -150,6 +153,12 @@ export interface DangerDSLType {
    * is classed as non-nullable
    */
   readonly gitlab: GitLabDSL
+  /**
+   *  Details specific to the hg changes within the code changes.
+   *  Currently, this is just the raw file paths that have been
+   *  added, removed or modified.
+   */
+  readonly hg: HgDSL
 
   /**
    * Functions which are globally useful in most Dangerfiles. Right
@@ -166,7 +175,7 @@ export class DangerDSL {
   public readonly bitbucket_server?: BitBucketServerDSL
   public readonly gitlab?: GitLabDSL
 
-  constructor(platformDSL: any, public readonly git: GitJSONDSL, public readonly utils: DangerUtilsDSL, name: string) {
+  constructor(platformDSL: any, public readonly git: GitJSONDSL, public readonly hg: HgJSONDSL, public readonly utils: DangerUtilsDSL, name: string) {
     switch (name) {
       case "GitHub":
       case "Fake": // Testing only

@@ -1,44 +1,42 @@
-// Please don't have includes in here that aren't inside the DSL folder, or the d.ts/flow defs break
 
 import { JSONDSL } from "./JSONDSL"
-import { GitCommit } from "./Commit"
+import { HgCommit } from "./Commit"
 import { Chainsmoker } from "../commands/utils/chainsmoker"
 import { TextDiff, StructuredDiff, JSONPatch, JSONDiff, MatchResult } from "./Diff+Patch"
 
-// This is `danger.git`
+// This is `danger.hg`
 
 /**
  *
- * The Git Related Metadata which is available inside the Danger DSL JSON
+ * The Mercurial Related Metadata which is available inside the Danger DSL JSON
  *
  * @namespace JSONDSL
  */
-export interface GitJSONDSL extends JSONDSL {
-  /** The Git commit metadata */
-  readonly commits: GitCommit[]
+export interface HgJSONDSL extends JSONDSL {
+  /** The Mercurial commit metadata */
+  readonly commits: HgCommit[]
 }
 
-/** The git specific metadata for a PR */
-export interface GitDSL extends GitJSONDSL {
+export interface HgDSL extends HgJSONDSL {
   /**
    * A Chainsmoker object to help match paths as an elegant DSL. It
    * lets you write a globbed string and then get booleans on whether
-   * there are matches within a certain part of the git DSL.
+   * there are matches within a certain part of the hg DSL.
    *
    * Use this to create an object which has booleans set on 4 keys
    * `modified`, `created`, `edited` (created + modified) and `deleted`.
    *
    * @example
-   * const packageJSON = danger.git.fileMatch("package.json")
-   * const lockfile = danger.git.fileMatch("yarn.lock")
+   * const packageJSON = danger.hg.fileMatch("package.json")
+   * const lockfile = danger.hg.fileMatch("yarn.lock")
    *
    * if (packageJSON.modified && !lockfile.modified) {
    *    warn("You might have forgotten to run `yarn`.")
    * }
    *
    * @example
-   * const needsSchemaChange = danger.git.fileMatch("src/app/analytics/*.ts")
-   * const schema = danger.git.fileMatch("src/app/analytics/schema.ts")
+   * const needsSchemaChange = danger.hg.fileMatch("src/app/analytics/*.ts")
+   * const schema = danger.hg.fileMatch("src/app/analytics/schema.ts")
    *
    * if (needsSchemaChange.edited && !schema.modified) {
    *    fail("Changes to the analytics files need to edit update the schema.")

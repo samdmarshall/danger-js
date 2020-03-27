@@ -1,5 +1,6 @@
 import { CISource, Env } from "../ci_source/ci_source"
-import { GitDSL, GitJSONDSL } from "../dsl/GitDSL"
+import { GitDSL } from "../dsl/GitDSL"
+import { JSONDSL } from "../dsl/JSONDSL"
 import { GitHub } from "./GitHub"
 import { GitHubAPI } from "./github/GitHubAPI"
 import { BitBucketServer } from "./BitBucketServer"
@@ -45,7 +46,7 @@ export interface Platform extends PlatformCommunicator {
   /** Pulls in the platform specific metadata for event runs */
   getPlatformReviewSimpleRepresentation?: () => Promise<any>
   /** Pulls in the Code Review Diff, and offers a succinct user-API for it */
-  getPlatformGitRepresentation: () => Promise<GitJSONDSL>
+  getPlatformSCMRepresentation: () => Promise<JSONDSL>
   /** Get the contents of a file at a path */
   getFileContents: (path: string, slug?: string, ref?: string) => Promise<string>
   /** Optional: Wrap the danger evaluation with some of your code */
@@ -148,7 +149,7 @@ export function getPlatformForEnv(env: Env, source: CISource): Platform {
   // They need to set the token up for GitHub actions to work
   if (env["GITHUB_EVENT_NAME"] && !ghToken) {
     console.error(`You need to add GITHUB_TOKEN to your Danger action in the workflow:
-  
+
     - name: Danger JS
       uses: danger/danger-js@X.Y.Z
       ${chalk.green(`env:

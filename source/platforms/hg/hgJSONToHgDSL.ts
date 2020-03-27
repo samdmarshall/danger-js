@@ -10,17 +10,11 @@ import * as jsonDiff from "fast-json-patch"
 import jsonpointer from "jsonpointer"
 import JSON5 from "json5"
 
-import { GitDSL, GitJSONDSL } from "../../dsl/GitDSL"
+import { HgDSL, HgJSONDSL } from "../../dsl/HgDSL"
 import { JSONPatchOperation, StructuredDiff } from "../../dsl/Diff+Patch"
 import chainsmoker from "../../commands/utils/chainsmoker"
 
-/*
- * As Danger JS bootstraps from JSON like all `danger process` commands
- * this file takes the original JSON, and wraps it into a complete DSL with
- * useful functions etc.
- */
-
-export interface GitJSONToGitDSLConfig {
+export interface HgJSONToHgDSLConfig {
   /** This is used in getFileContents to figure out your repo  */
   repo?: string
 
@@ -35,10 +29,10 @@ export interface GitJSONToGitDSLConfig {
   getFileContents: (path: string, repo: string | undefined, sha: string) => Promise<string>
   /** A promise which will return the diff string content for a file between shas */
   getFullDiff?: (base: string, head: string) => Promise<string>
-  getStructuredDiffForFile?: (base: string, head: string, filename: string) => Promise<GitStructuredDiff>
+  getStructuredDiffForFile?: (base: string, head: string, filename: string) => Promise<HgStructuredDiff>
 }
 
-export type GitStructuredDiff = {
+export type HgStructuredDiff = {
   from?: string
   to?: string
   chunks: Chunk[]
@@ -50,7 +44,7 @@ export interface Chunk {
 
 export type Changes = { type: "add" | "del" | "normal"; content: string }[]
 
-export const gitJSONToGitDSL = (gitJSONRep: GitJSONDSL, config: GitJSONToGitDSLConfig): GitDSL => {
+export const hgJSONToHgDSL = (hgJSONRep: HgJSONDSL, config: HgJSONToHgDSLConfig): HgDSL => {
   const getFullDiff: ((base: string, head: string) => Promise<string>) | null = config.getStructuredDiffForFile
     ? null
     : memoize(
@@ -69,7 +63,7 @@ export const gitJSONToGitDSL = (gitJSONRep: GitJSONDSL, config: GitJSONToGitDSLC
   const JSONPatchForFile = async (filename: string) => {
     // We already have access to the diff, so see if the file is in there
     // if it's not return an empty diff
-    if (!gitJSONRep.modified_files.includes(filename)) {
+    if (!hgJSONRep.modified_files.includes(filename)) {
       return null
     }
 
@@ -158,9 +152,9 @@ export const gitJSONToGitDSL = (gitJSONRep: GitJSONDSL, config: GitJSONToGitDSLC
 
   const linesOfCode = async () => {
     const [createdFilesDiffs, modifiedFilesDiffs, deletedFilesDiffs] = await Promise.all([
-      Promise.all(gitJSONRep.created_files.map(path => diffForFile(path))),
-      Promise.all(gitJSONRep.modified_files.map(path => diffForFile(path))),
-      Promise.all(gitJSONRep.deleted_files.map(path => diffForFile(path))),
+      Promise.all(hgJSONRep.created_files.map(path => diffForFile(path))),
+      Promise.all(hgJSONRep.modified_files.map(path => diffForFile(path))),
+      Promise.all(hgJSONRep.deleted_files.map(path => diffForFile(path))),
     ])
 
     let additions = createdFilesDiffs
@@ -184,12 +178,12 @@ export const gitJSONToGitDSL = (gitJSONRep: GitJSONDSL, config: GitJSONToGitDSLC
   const getContent = ({ content }: { content: string }) => content
 
   /**
-   * Gets the git-style diff for a single file.
+   * Gets the hg-style diff for a single file.
    *
    * @param filename File path for the diff
    */
   const structuredDiffForFile = async (filename: string): Promise<StructuredDiff | null> => {
-    let fileDiffs: GitStructuredDiff
+    let fileDiffs: HgStructuredDiff
 
     if (config.getStructuredDiffForFile) {
       fileDiffs = await config.getStructuredDiffForFile(config.baseSHA, config.headSHA, filename)
@@ -206,7 +200,7 @@ export const gitJSONToGitDSL = (gitJSONRep: GitJSONDSL, config: GitJSONToGitDSLC
   }
 
   /**
-   * Gets the git-style diff for a single file.
+   * Gets the hg-style diff for a single file.
    *
    * @param filename File path for the diff
    */
@@ -241,15 +235,15 @@ export const gitJSONToGitDSL = (gitJSONRep: GitJSONDSL, config: GitJSONToGitDSLC
 
   return {
     fileMatch: chainsmoker({
-      modified: gitJSONRep.modified_files,
-      created: gitJSONRep.created_files,
-      deleted: gitJSONRep.deleted_files,
-      edited: gitJSONRep.modified_files.concat(gitJSONRep.created_files),
+      modified: hgJSONRep.modified_files,
+      created: hgJSONRep.created_files,
+      deleted: hgJSONRep.deleted_files,
+      edited: hgJSONRep.modified_files.concat(hgJSONRep.created_files),
     }),
-    modified_files: gitJSONRep.modified_files,
-    created_files: gitJSONRep.created_files,
-    deleted_files: gitJSONRep.deleted_files,
-    commits: gitJSONRep.commits,
+    modified_files: hgJSONRep.modified_files,
+    created_files: hgJSONRep.created_files,
+    deleted_files: hgJSONRep.deleted_files,
+    commits: hgJSONRep.commits,
     diffForFile,
     structuredDiffForFile,
     JSONPatchForFile,

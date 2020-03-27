@@ -6,11 +6,15 @@ import { GitCommit } from "../dsl/Commit"
 import { localGetDiff } from "./git/localGetDiff"
 import { localGetFileAtSHA } from "./git/localGetFileAtSHA"
 import { localGetCommits } from "./git/localGetCommits"
-import { readFileSync } from "fs"
+import { readFileSync, existsSync } from "fs"
 
 export interface LocalGitOptions {
   base?: string
   staging?: boolean
+}
+
+export function isGitRepo(): boolean {
+  return existsSync(".git/")
 }
 
 export class LocalGit implements Platform {
@@ -41,7 +45,7 @@ export class LocalGit implements Platform {
     return null
   }
 
-  async getPlatformGitRepresentation(): Promise<GitDSL> {
+  async getPlatformSCMRepresentation(): Promise<GitDSL> {
     const base = this.options.base || "master"
     const head = "HEAD"
     const diff = await this.getGitDiff()

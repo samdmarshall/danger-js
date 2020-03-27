@@ -27,7 +27,7 @@ export class BitBucketCloud implements Platform {
    *
    * @returns {Promise<GitDSL>} the git DSL
    */
-  getPlatformGitRepresentation = (): Promise<GitJSONDSL> => gitDSLForBitBucketCloud(this.api)
+  getPlatformSCMRepresentation = (): Promise<GitJSONDSL> => gitDSLForBitBucketCloud(this.api)
 
   /**
    * Returns the `bitbucket_cloud` object on the Danger DSL
