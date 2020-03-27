@@ -20,9 +20,9 @@ const author = `"author": \{"name": "${authorName}", "email": "${authorEmail}", 
 const committer = `"committer": \{"name": "${committerName}", "email": "${committerEmail}", "date": "${committerDate}" \}`
 export const formatJSON = `\{ "sha": "${sha}", "parents": "${parents}", ${author}, ${committer}, "message": "${message}"\},`
 
-export const localGetCommits = (base: string, tip: string) =>
+export const localGetCommits = (base: string, tip: string = "tip") =>
   new Promise<HgCommit[]>(done => {
-    const args = ["log", `${base}...${tip}`, `--template ${formatJSON}`]
+    const args = ["log", `--rev ${base}:${tip}`, `--template ${formatJSON}`]
     const child = spawn("hg", args, { env: process.env })
     d("> hg", args.join(" "))
     child.stdout.on("data", async data => {
